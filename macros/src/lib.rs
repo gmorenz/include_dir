@@ -55,12 +55,12 @@ fn expand_dir(root: &Path, path: &Path) -> proc_macro2::TokenStream {
         if child.is_dir() {
             let tokens = expand_dir(root, &child);
             child_tokens.push(quote! {
-                include_dir::DirEntry::Dir(#tokens)
+                ::include_dir::DirEntry::Dir(#tokens)
             });
         } else if child.is_file() {
             let tokens = expand_file(root, &child);
             child_tokens.push(quote! {
-                include_dir::DirEntry::File(#tokens)
+                ::include_dir::DirEntry::File(#tokens)
             });
         } else {
             panic!("\"{}\" is neither a file nor a directory", child.display());
@@ -71,8 +71,8 @@ fn expand_dir(root: &Path, path: &Path) -> proc_macro2::TokenStream {
 
     quote! {
         {
-            static CHILDREN: &[include_dir::DirEntry] = &[ #(#child_tokens),* ];
-            include_dir::Dir::new(#path, CHILDREN)
+            static CHILDREN: &[::include_dir::DirEntry] = &[ #(#child_tokens),* ];
+            ::include_dir::Dir::new(#path, CHILDREN)
         }
     }
 }
@@ -93,7 +93,7 @@ fn expand_file(root: &Path, path: &Path) -> proc_macro2::TokenStream {
     let normalized_path = normalize_path(root, path);
 
     let tokens = quote! {
-        include_dir::File::new(#normalized_path, #literal)
+        ::include_dir::File::new(#normalized_path, #literal)
     };
 
     match metadata(path) {
@@ -117,7 +117,7 @@ fn metadata(path: &Path) -> Option<proc_macro2::TokenStream> {
     let modified = meta.modified().map(to_unix).ok()?;
 
     Some(quote! {
-        include_dir::Metadata::new(
+        ::include_dir::Metadata::new(
             std::time::Duration::from_secs(#accessed),
             std::time::Duration::from_secs(#created),
             std::time::Duration::from_secs(#modified),
