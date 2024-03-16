@@ -5,7 +5,7 @@ use tempfile::TempDir;
 static PARENT_DIR: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR");
 
 #[test]
-#[cfg(feature = "glob")]
+#[cfg(all(feature = "glob", feature="fs"))]
 fn test_dynamic_glob() {
     let dir = Dir::from_fs("src").unwrap();
     for file in dir.find("**/*.rs").unwrap() {

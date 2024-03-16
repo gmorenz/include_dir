@@ -1,7 +1,11 @@
-use crate::my_cow::Cow;
 use crate::{Dir, File};
-use std::io::Read;
 use std::path::Path;
+
+#[cfg(feature = "fs")]
+use crate::my_cow::Cow;
+
+#[cfg(feature = "fs")]
+use std::io::Read;
 
 /// A directory entry, roughly analogous to [`std::fs::DirEntry`].
 #[derive(Debug, Clone, PartialEq)]
@@ -13,6 +17,7 @@ pub enum DirEntry<'a> {
 }
 
 impl<'a> DirEntry<'a> {
+    #[cfg(feature = "fs")]
     pub(crate) fn from_fs(path: String, entry: cap_std::fs::DirEntry) -> std::io::Result<DirEntry<'static>> {
         let kind = entry.file_type()?;
         if kind.is_file() {

@@ -96,6 +96,7 @@ where
     B: ToOwned + ?Sized,
 {
     Borrowed(&'a B),
+    #[allow(unused)]
     Owned(<B as ToOwned>::Owned),
 }
 

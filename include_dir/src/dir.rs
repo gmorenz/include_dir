@@ -18,12 +18,14 @@ impl<'a> Dir<'a> {
         }
     }
 
+    #[cfg(feature = "fs")]
     /// Create a new [`Dir`] by reading a filesystem directory (recursively) into memory
     pub fn from_fs(path: impl AsRef<Path>) -> std::io::Result<Dir<'static>> {
         let dir = cap_std::fs::Dir::open_ambient_dir(path, cap_std::ambient_authority())?;
         Self::from_fs_and_path(String::new(), dir)
     }
 
+    #[cfg(feature = "fs")]
     /// Create a new [`Dir`] by reading a filesystem directory (recursively) into memory
     pub fn from_fs_and_path(path: String, dir: cap_std::fs::Dir) -> std::io::Result<Dir<'static>> {
         Ok(Dir {
