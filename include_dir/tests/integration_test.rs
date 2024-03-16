@@ -5,6 +5,15 @@ use tempfile::TempDir;
 static PARENT_DIR: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR");
 
 #[test]
+#[cfg(feature = "glob")]
+fn test_dynamic_glob() {
+    let dir = Dir::from_fs("src").unwrap();
+    for file in dir.find("**/*.rs").unwrap() {
+        assert!(file.path().extension().unwrap() == "rs", "path is '{}'", file.path().display());
+    }
+}
+
+#[test]
 fn included_all_files_in_the_include_dir_crate() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
 
