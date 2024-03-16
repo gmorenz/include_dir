@@ -12,7 +12,7 @@ pub enum DirEntry<'a> {
 
 impl<'a> DirEntry<'a> {
     /// The [`DirEntry`]'s full path.
-    pub fn path(&self) -> &'a Path {
+    pub fn path(&self) -> &Path {
         match self {
             DirEntry::Dir(d) => d.path(),
             DirEntry::File(f) => f.path(),
@@ -36,7 +36,7 @@ impl<'a> DirEntry<'a> {
     }
 
     /// Get this item's sub-items, if it has any.
-    pub fn children(&self) -> &'a [DirEntry<'a>] {
+    pub fn children(&self) -> &[DirEntry<'a>] {
         match self {
             DirEntry::Dir(d) => d.entries(),
             DirEntry::File(_) => &[],

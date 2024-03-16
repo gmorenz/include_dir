@@ -3,11 +3,13 @@ use std::{
     path::Path,
 };
 
+use crate::my_cow::Cow;
+
 /// A file with its contents stored in a `&'static [u8]`.
 #[derive(Clone, PartialEq, Eq)]
 pub struct File<'a> {
-    path: &'a str,
-    contents: &'a [u8],
+    path: Cow<'a, str>,
+    contents: Cow<'a, [u8]>,
     #[cfg(feature = "metadata")]
     metadata: Option<crate::Metadata>,
 }
@@ -16,8 +18,8 @@ impl<'a> File<'a> {
     /// Create a new [`File`].
     pub const fn new(path: &'a str, contents: &'a [u8]) -> Self {
         File {
-            path,
-            contents,
+            path: Cow::Borrowed(path),
+            contents: Cow::Borrowed(contents),
             #[cfg(feature = "metadata")]
             metadata: None,
         }
@@ -25,13 +27,13 @@ impl<'a> File<'a> {
 
     /// The full path for this [`File`], relative to the directory passed to
     /// [`crate::include_dir!()`].
-    pub fn path(&self) -> &'a Path {
-        Path::new(self.path)
+    pub fn path(&self) -> &Path {
+        Path::new(self.path.as_ref())
     }
 
     /// The file's raw contents.
     pub fn contents(&self) -> &[u8] {
-        self.contents
+        self.contents.as_ref()
     }
 
     /// The file's contents interpreted as a string.

@@ -93,6 +93,9 @@
 mod dir;
 mod dir_entry;
 mod file;
+/// Because `Cow` doesn't like cyclic types for some reason.
+/// https://discord.com/channels/924488641894563840/930621147840667649/1218605954103509092
+mod my_cow;
 
 #[cfg(feature = "metadata")]
 mod metadata;
