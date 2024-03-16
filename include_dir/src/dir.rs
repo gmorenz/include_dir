@@ -18,6 +18,30 @@ impl<'a> Dir<'a> {
         }
     }
 
+    /// Create a new [`Dir`] by reading a filesystem directory (recursively) into memory
+    pub fn from_fs(path: impl AsRef<Path>) -> std::io::Result<Dir<'static>> {
+        let dir = cap_std::fs::Dir::open_ambient_dir(path, cap_std::ambient_authority())?;
+        Self::from_fs_and_path(String::new(), dir)
+    }
+
+    /// Create a new [`Dir`] by reading a filesystem directory (recursively) into memory
+    pub fn from_fs_and_path(path: String, dir: cap_std::fs::Dir) -> std::io::Result<Dir<'static>> {
+        Ok(Dir {
+            path: Cow::Borrowed(""),
+            entries: dir.entries()?.map(|entry| {
+                let entry = entry?;
+                let file_name = entry.file_name();
+                let file_name = file_name.to_str().ok_or_else(|| {
+                    std::io::Error::new(std::io::ErrorKind::Unsupported, "Filename contains non-utf8 characters")
+                })?;
+                let path = format!("{}/{}", path, file_name);
+                DirEntry::from_fs(path, entry)
+            }).collect::<Result<Vec<_>, _>>()
+              .map(|vec| Cow::Owned(vec))?,
+        })
+    }
+
+
     /// The full path for this [`Dir`], relative to the directory passed to
     /// [`crate::include_dir!()`].
     pub fn path(&self) -> &Path {

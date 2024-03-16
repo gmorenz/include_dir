@@ -8,8 +8,8 @@ use crate::my_cow::Cow;
 /// A file with its contents stored in a `&'static [u8]`.
 #[derive(Clone, PartialEq, Eq)]
 pub struct File<'a> {
-    path: Cow<'a, str>,
-    contents: Cow<'a, [u8]>,
+    pub(crate) path: Cow<'a, str>,
+    pub(crate) contents: Cow<'a, [u8]>,
     #[cfg(feature = "metadata")]
     metadata: Option<crate::Metadata>,
 }

@@ -12,6 +12,7 @@ edition = "2021"
 rust-version = "1.56"
 
 [dependencies]
+cap-std = "3.0.0"
 glob = { version = "0.3", optional = true }
 include_dir_macros = { version = "^0.7.0", path = "../macros" }
 

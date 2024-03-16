@@ -3,7 +3,7 @@ use glob::{Pattern, PatternError};
 
 impl<'a> Dir<'a> {
     /// Search for a file or directory with a glob pattern.
-    pub fn find(&self, glob: &str) -> Result<impl Iterator<Item = &'a DirEntry<'a>>, PatternError> {
+    pub fn find<'b: 'a>(&'b self, glob: &str) -> Result<impl Iterator<Item = &'b DirEntry<'b>>, PatternError> {
         let pattern = Pattern::new(glob)?;
 
         Ok(Globs::new(pattern, self))
@@ -17,7 +17,8 @@ struct Globs<'a> {
 }
 
 impl<'a> Globs<'a> {
-    pub(crate) fn new(pattern: Pattern, root: &Dir<'a>) -> Globs<'a> {
+    pub(crate) fn new<'b>(pattern: Pattern, root: &'a Dir<'a>) -> Globs<'a>
+    {
         let stack = root.entries().iter().collect();
         Globs { stack, pattern }
     }

@@ -1,4 +1,6 @@
+use crate::my_cow::Cow;
 use crate::{Dir, File};
+use std::io::Read;
 use std::path::Path;
 
 /// A directory entry, roughly analogous to [`std::fs::DirEntry`].
@@ -11,6 +13,23 @@ pub enum DirEntry<'a> {
 }
 
 impl<'a> DirEntry<'a> {
+    pub(crate) fn from_fs(path: String, entry: cap_std::fs::DirEntry) -> std::io::Result<DirEntry<'static>> {
+        let kind = entry.file_type()?;
+        if kind.is_file() {
+            let mut contents = vec![];
+            entry.open()?.read_to_end(&mut contents)?;
+            Ok(DirEntry::File(File {
+                path: Cow::Owned(path),
+                contents: Cow::Owned(contents),
+            }))
+        }
+        else if kind.is_dir() {
+            Ok(DirEntry::Dir(Dir::from_fs_and_path(path, entry.open_dir()?)?))
+        } else {
+            Err(std::io::Error::new(std::io::ErrorKind::Unsupported, "Directory contains something that is neither a File nor a Directory"))
+        }
+    }
+
     /// The [`DirEntry`]'s full path.
     pub fn path(&self) -> &Path {
         match self {
